@@ -1,0 +1,6 @@
+{
+  "name": "example-url-handler",
+  "version": "0.0.1",
+  "description": "An example Jancy URL handler plugin",
+  "main": "src/index.js"
+}
