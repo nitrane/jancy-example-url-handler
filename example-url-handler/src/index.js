@@ -69,22 +69,66 @@ module.exports = {
 }
 
 
-/* Custom URL handler that looks for URLs that start with "example://" and does something
+/* Custom URL handler that looks URLs formatted like this:
+**
+** cookie://<cookie-name>:<cookie-value>
+**
+** it finds a URL that looks like that then:
+**
+** 1. Attempt to parse the cookie information from the URL.
+** 2. Add a cookie to the partition for the domain of the current URL of the tab.
+** 3. Reset the URL in the nav bar.
+** 4. Tell Jancy it needs to take no further action.
 **
 ** Arguments:
 **    jancy (object)
 **    tab (object)
-**    webContent (object)
 **    url (string)
 **
 ** Returns true if we handled the URL and Jancy has to take no further action.
 */
-function urlHandler(jancy, tab, webContent, url) {
+function urlHandler(jancy, tab, url) {
 
-  if (url.startsWith("example://")) {
+  if (url.startsWith("cookie://")) {
+
     /* This is a URL we're interested in.
     */
-    jancy.console.log("example-url-handler: got a URL we're interested in")
+    jancy.console.log(`example-url-handler: got a \"cookie\" URL for ${ url }`)
+
+    /* 1. Strip off the "cookie://" part.
+    */
+    url = url.slice(9)
+    const pos = url.indexOf(':')
+    if (pos !== -1) {
+
+      const cookieName = url.slice(0, pos)
+      const cookieValue = url.slice(pos+1)
+
+      /* 2. Add a cookie to the partition for the domain of the current URL of the tab.
+      */
+      const u = new URL(tab.url)
+      const partition = jancy.partitions.getPartition(tab.partitionId)
+      const newCookie = jancy.partitions.makeCookie({
+        name: cookieName,
+        value: cookieValue,
+        domain: u.hostname
+      })
+
+      jancy.partitions.addCookies(partition, [ newCookie ]).then(() => {
+        jancy.console.log(`example-url-handler: cookie added!`)
+      })
+
+    } else {
+      jancy.console.log(`example-url-handler: failed parsing cookie from`)
+    }
+
+    /* 3. Reset the URL of the tab.
+    */
+    jancy.tabManager.updateTab(tab, { url: tab.url }, true)
+
+    /* 4. No further processing of this URL needs to happen.
+    */
+    return true
   }
 
   return false
