@@ -7,8 +7,8 @@
 ## Adding the Plug-in to Jancy
 
 1. Open the Jancy plug-in folder
-    - On Windows, open Windows File Explorer and go to %appdata%\Jancy\plugins or on MacOS
-    - On MacOS, open Finder and go to `TODO`
+    - On Windows, open Windows File Explorer and go to `%appdata%\Jancy\plugins`
+    - On MacOS, open Finder and go to `~/Library/Application Support/Jancy/plugins`
 2. Copy `example-url-handler` folder to the plug-ins folder from step 1.
 3. Restart Jancy if it's already running.
 4. If everything works correctly you should see the example plugin in the list of plugins in `File -> Settings -> Plugins`.
